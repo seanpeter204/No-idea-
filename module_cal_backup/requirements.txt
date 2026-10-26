@@ -1,0 +1,2 @@
+# Runtime: standard library only (ctypes). Windows + a vendor J2534 DLL
+# are required at runtime; nothing to pip-install for the tool itself.
