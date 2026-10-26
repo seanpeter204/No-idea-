@@ -64,6 +64,33 @@ Each run creates `backups/backup_<UTC>/` containing:
   SHA-256 + size of any memory image.
 - `<module>_mem_<addr>_<size>.bin` — raw memory images, where permitted.
 
+## Working with a .bin you already read (bintools)
+
+If you pulled a calibration/firmware image off a module you own (e.g. with your
+DPS read tool), `bintools` handles the safekeeping side — all offline, no
+vehicle or OEM service involved:
+
+```bash
+# Integrity + structure: checksums, segment map (code vs low-entropy cal
+# tables), and embedded strings (part #, CALID, dates)
+python -m module_cal_backup.bincli info eps.bin
+
+# Catch drift/corruption: byte-range diff of two read-backs. Flags a length
+# mismatch loudly (usually a truncated/failed read). Exit code 1 if differ.
+python -m module_cal_backup.bincli diff before.bin after.bin
+
+# Archive into a hashed, dated folder with a manifest; dedupes on content hash
+python -m module_cal_backup.bincli archive eps.bin --out ./cal_archive \
+    --module eps --vin 1G1... --note "pre-repair read"
+```
+
+Typical flow: read with your tool → `archive` it → later `diff` a fresh read
+against the archived copy to prove nothing changed. The segment scan is a
+heuristic (long 0x00/0xFF fill runs = boundaries), not a parsed segment table —
+confirm a boundary against the module's documented memory map before trusting
+it. The running checksums are sanity values for spotting a bad read, not the
+module's own stored checksum.
+
 ## Project layout
 
 | File | Purpose |
@@ -73,7 +100,9 @@ Each run creates `backups/backup_<UTC>/` containing:
 | `modules.py` | Module address registry + standardized ISO 14229 DIDs |
 | `discover.py` | Read-only bus scan for responding addresses |
 | `backup.py` | Backup engine: probe → read identification → dump → hashed manifest |
-| `cli.py` | Command-line entry point |
+| `cli.py` | Command-line entry point (on-vehicle backup) |
+| `bintools.py` | Offline .bin analysis: checksums, segment/string scan, diff, archive |
+| `bincli.py` | Command-line entry point for `info` / `diff` / `archive` |
 | `keys_example.py` | Pluggable security-access key hook examples |
 | `tests/` | Off-vehicle tests (fake channel; no hardware needed) |
 
