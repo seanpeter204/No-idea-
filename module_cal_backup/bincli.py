@@ -13,6 +13,7 @@ import pathlib
 import sys
 
 from . import bintools as bt
+from . import calrecord as cr
 
 
 def _cmd_info(args) -> int:
@@ -63,6 +64,33 @@ def _cmd_archive(args) -> int:
     return 0
 
 
+def _cmd_calrec(args) -> int:
+    if args.calrec_cmd == "add":
+        rec = cr.load_record(args.file)
+        path = cr.save_record(rec, args.out)
+        missing = sum(1 for s in rec.segments
+                      if not s.cvn or s.cvn.upper() == "N/A")
+        print(f"saved -> {path}")
+        print(f"  {rec.controller_code} {rec.controller_name} / VIN {rec.vin}"
+              f" / {len(rec.segments)} segments")
+        if missing:
+            print(f"  {missing} segment(s) still need a CVN (GET CVN per part #)")
+        return 0
+    if args.calrec_cmd == "list":
+        recs = cr.list_records(args.out)
+        if not recs:
+            print("no cal records yet")
+            return 0
+        for r in recs:
+            miss = sum(1 for s in r["segments"]
+                       if not s["cvn"] or s["cvn"].upper() == "N/A")
+            tag = f"  ({miss} missing CVN)" if miss else ""
+            print(f"{r['vin']}  {r['controller_code']} {r['controller_name']}"
+                  f"  {len(r['segments'])} seg{tag}")
+        return 0
+    return 2
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="module_cal_backup.bincli")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -86,6 +114,15 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--vin", default="")
     p.add_argument("--note", default="")
     p.set_defaults(func=_cmd_archive)
+
+    p = sub.add_parser("calrec", help="store/list structured cal-ID records")
+    csub = p.add_subparsers(dest="calrec_cmd", required=True)
+    pa = csub.add_parser("add", help="ingest a filled cal-record JSON")
+    pa.add_argument("file")
+    pa.add_argument("--out", default="./cal_archive")
+    pl = csub.add_parser("list", help="list stored cal records")
+    pl.add_argument("--out", default="./cal_archive")
+    p.set_defaults(func=_cmd_calrec)
 
     args = ap.parse_args(argv)
     return args.func(args)

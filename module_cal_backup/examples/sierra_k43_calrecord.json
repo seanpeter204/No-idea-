@@ -1,0 +1,28 @@
+{
+  "vin": "3GTU2VEC4EG204931",
+  "controller_code": "K43",
+  "controller_name": "Power Steering Control Module",
+  "vehicle": "2014 GMC Sierra 1500 (K2XX)",
+  "source": "SPS2 gateway.ext.gm.com",
+  "selected_part_number": "23467711",
+  "programming_part_numbers": [
+    "22751984", "23117730", "23125719", "23341132", "23467711"
+  ],
+  "notes": "CVNs show N/A in the SPS2 history view; pull each via GET CVN and fill cvn below. Mark the loaded part numbers current:true after reading the module with DPS Get Controller Info.",
+  "segments": [
+    {"segment": "operating_system", "part_number": "23144662", "cvn": "", "description": "Operating System"},
+    {"segment": "operating_system", "part_number": "23158386", "cvn": "", "description": "Operating System"},
+    {"segment": "operating_system", "part_number": "23185543", "cvn": "", "description": "Operating System"},
+    {"segment": "operating_system", "part_number": "23210763", "cvn": "", "description": "Operating System"},
+    {"segment": "operating_system", "part_number": "23433183", "cvn": "", "description": "Operating System"},
+
+    {"segment": "calibration", "part_number": "23144669", "cvn": "", "description": "Calibration"},
+    {"segment": "calibration", "part_number": "23158360", "cvn": "", "description": "Calibration"},
+    {"segment": "calibration", "part_number": "23185549", "cvn": "", "description": "Calibration"},
+    {"segment": "calibration", "part_number": "23210769", "cvn": "", "description": "Calibration"},
+    {"segment": "calibration", "part_number": "23214100", "cvn": "", "description": "Calibration"},
+    {"segment": "calibration", "part_number": "84391470", "cvn": "", "description": "New calibration to address intermittent loss of steering assist per Product Safety Recall 17276 (MY2014) or 18289 (MY2015)", "bulletin": "17276 / 18289"},
+
+    {"segment": "system", "part_number": "23341135", "cvn": "", "description": "System"}
+  ]
+}

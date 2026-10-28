@@ -91,6 +91,29 @@ confirm a boundary against the module's documented memory map before trusting
 it. The running checksums are sanity values for spotting a bad read, not the
 module's own stored checksum.
 
+## Recording cal-ID maps (SPS2 / GM gateway lookup)
+
+GM's VIN-based cal lookup (gateway.ext.gm.com) gives you a module's
+calibration *part-number map* — the identification reference, not a binary.
+`calrec` stores it as a structured record in the same archive, keyed on
+(VIN, controller), so re-ingesting after you fill in CVNs updates in place.
+
+A GM module flash is three segments — `operating_system`, `calibration`,
+`system` — so the record captures all three plus the programming-event cal IDs.
+
+```bash
+# Ingest a filled record (see examples/sierra_k43_calrecord.json for the shape)
+python -m module_cal_backup.bincli calrec add my_record.json --out ./cal_archive
+
+# List stored records (flags how many segments still need a CVN)
+python -m module_cal_backup.bincli calrec list --out ./cal_archive
+```
+
+Workflow: copy the part numbers off the SPS2 screen into a record JSON, pull
+each **CVN** via GET CVN (the integrity value — part# + CVN is the verifiable
+pair), and `calrec add` it. `examples/sierra_k43_calrecord.json` is a
+real-shaped template (K43 PSCM) you can copy and edit.
+
 ## Project layout
 
 | File | Purpose |
@@ -102,7 +125,8 @@ module's own stored checksum.
 | `backup.py` | Backup engine: probe → read identification → dump → hashed manifest |
 | `cli.py` | Command-line entry point (on-vehicle backup) |
 | `bintools.py` | Offline .bin analysis: checksums, segment/string scan, diff, archive |
-| `bincli.py` | Command-line entry point for `info` / `diff` / `archive` |
+| `calrecord.py` | Structured cal-ID record store (SPS2 part-number maps + CVNs) |
+| `bincli.py` | Command-line entry point for `info` / `diff` / `archive` / `calrec` |
 | `keys_example.py` | Pluggable security-access key hook examples |
 | `tests/` | Off-vehicle tests (fake channel; no hardware needed) |
 
