@@ -1,0 +1,29 @@
+{
+  "eps": {
+    "name": "Electric Power Steering",
+    "tx_id": "0x730",
+    "rx_id": "0x738",
+    "extended": false,
+    "mem_region": ["0x00008000", "0x00004000"]
+  },
+  "sas": {
+    "name": "Steering Angle Sensor",
+    "tx_id": "0x732",
+    "rx_id": "0x73A"
+  },
+  "abs": {
+    "name": "ABS / Brake Control",
+    "tx_id": "0x760",
+    "rx_id": "0x768"
+  },
+  "srs": {
+    "name": "Airbag / SRS",
+    "tx_id": "0x780",
+    "rx_id": "0x788"
+  },
+  "bcm": {
+    "name": "Body Control Module",
+    "tx_id": "0x720",
+    "rx_id": "0x728"
+  }
+}
